@@ -25,16 +25,18 @@ class Map(object):
     PLAYER_C = 'C'
     PLAYER_D = 'D'
 
-    def __init__(self, description, target=None):
-        self.target = target
+    def __init__(self, description, player_name, target=None):
         self.map = []
         self.players = {}
         self.description = []
+        self.target = target
 
         self.parse(description)
-        self.update()
 
         self.find_players()
+        self.player = self.get_player(player_name)
+
+        self.update()
 
     def parse(self, description):
         """
@@ -89,7 +91,7 @@ class Map(object):
                     cell = self.get_cell(threat.x, threat.y, s, d)
                     # print threat.x, threat.y, s, d, cell.kind
                     # block that prevent the bot from advancing in that direction
-                    if cell.is_wall or cell.is_undestructible:
+                    if cell.is_wall or cell.is_undestructible or cell.kind == self.player.name:
                         directions[d] = False
                         continue
                     # TODO: try replacing all cells with trap blocks
@@ -100,14 +102,14 @@ class Map(object):
                         cell.weight = cell.weight + threat.weight
                 # print '>', directions
 
-    def next(self, player_name):
+    def next(self):
         """
         Returns the next action for a given Player in this map.
         """
 
         # calculate cost of moving
 
-        player = self.get_player(player_name)
+        player = self.player
         start = self.get_cell(player.x, player.y)
 
         distances = [20000 for i in range(0, 121)]
