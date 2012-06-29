@@ -81,17 +81,23 @@ class Map(object):
         Scan the map looking for threats and update the cell weights.
         """
         steps = 3
-        directions = {'UP': True, 'RIGHT': True, 'DOWN': True, 'LEFT': True}
 
+        # print [c.kind for c in self.threats]
         for threat in self.threats:
+            directions = {'UP': True, 'RIGHT': True, 'DOWN': True, 'LEFT': True}
             for s in range(1, steps + 1):
                 for k, d in enumerate(directions):
                     if not directions[d]:
                         continue
                     cell = self.get_cell(threat.x, threat.y, s, d)
+                    # print cell.kind, cell.x, cell.y, cell.weight
                     # print threat.x, threat.y, s, d, cell.kind
                     # block that prevent the bot from advancing in that direction
-                    if cell.is_wall or cell.is_undestructible or cell.kind == self.player.name:
+                    if cell.is_wall or cell.is_undestructible:
+                        directions[d] = False
+                        continue
+                    elif cell.kind == self.player.name:
+                        cell.weight = cell.weight + threat.weight
                         directions[d] = False
                         continue
                     # TODO: try replacing all cells with trap blocks
@@ -153,27 +159,27 @@ class Map(object):
             cells = self.find(lambda c: c.kind == self.target)
         else:
             cells = []
-        print 'stored target:', self.target, [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
+        # print 'Previous:', self.target, [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
 
         powers = self.find(lambda c: c.is_improvement)
         players = self.find(lambda c: c.is_player and c.kind != player.name)
         cells = cells + sorted(powers + players, comparator)
-        print [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
+        # print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
 
         if len(cells) > 0:
             self.target = cells[0].kind
 
-        action = None
-
-        for cell in cells:
-            action = self.move(start, cell)
-            if action is not None:
-                print 'Target:', cell.kind, cell.x, cell.y, cell.weight
-                break
-
+        # print 'Start:', start.kind, start.x, start.y, start.weight
+        action = self.choose(start, cells)
+        print 1, action, start.weight
+        # if we are on a bomb's range and the bot decided to stay, let's try to
+        # to move to one of the adyacent cells to avoid explosion
+        if (action is None or action is Player.STAY) and start.weight > 1.5:
+            cells = sorted(self.get_adjacent_cells(start.x, start.y), comparator)
+            action = self.choose(start, cells)
         if action is None:
             return Player.STAY
-
+        print 2, action, start.weight
         return action
 
         # for y in range(0, 11):
@@ -181,6 +187,15 @@ class Map(object):
         #     print distances[i:i+11]
 
         # no action, let's just stay here for a while
+
+    def choose(self, start, cells):
+        action = None
+        for cell in cells:
+            action = self.move(start, cell)
+            if action is not None:
+                # print 'Target:', cell.kind, cell.x, cell.y, cell.weight
+                break
+        return action
 
     def move(self, start, target):
         """
@@ -205,7 +220,7 @@ class Map(object):
         # block that prevents the bot from advancing in that direction
         if next.is_wall or next.is_undestructible or next.is_player:
             return None
-        if next.is_bomb_range:
+        if next.is_player or next.is_bomb:
             return None
 
         if next.x == start.x:
@@ -221,7 +236,6 @@ class Map(object):
 
         # only reason for start cell to have a weight greater than 1.5
         # is that the cell is close to a tickling bomb. Let's move.
-        print "Start:", start.kind, start.x, start.y, start.weight
         if start.weight > 1.5:
             return action
 

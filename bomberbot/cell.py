@@ -33,6 +33,7 @@ class Cell(object):
         self.is_player = False
         self.is_empty = False
         self.is_wall = False
+        self.is_bomb = False
         self.is_bomb_range = False
         self.is_undestructible = False
 
@@ -88,6 +89,7 @@ class Cell(object):
             kind = cls.TICKLING_BOMB_3
             weight = 62
         block = Cell(kind, x, y, weight, parent)
+        block.is_bomb = True
         return block
 
     @classmethod

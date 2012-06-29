@@ -11,12 +11,14 @@ from map import Map
 class BomberBot(object):
 
     def __init__(self):
+        self.retry = True
         self.maps = []
 
     def start(self):
         try:
-            self.connect("wvega", "4feb56401b06eeff15002518")
-            self.standby()
+            while self.retry:
+                self.connect("wvega", "4feb56401b06eeff15002518")
+                self.standby()
         except KeyboardInterrupt:
             print "\n\nGoodbay!"
             self.disconnect()
@@ -28,7 +30,11 @@ class BomberBot(object):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(("bomberbot.com", 5000))
 
-        print self.client.recv(4096)
+        message = self.client.recv(4096)
+        while message.find('Ingrese usuario y token:') == -1:
+            message = message + self.client.recv(4096)
+
+        print message
         print "Username: %s, Token: %s\n\n" % (username, token.replace(r'0', '*'))
 
         self.client.send("%s,%s" % (username, token))
@@ -49,37 +55,45 @@ class BomberBot(object):
                 self.update(message[1])
                 print 'Bot just joined a new game as player %s.' % self.name
 
+            elif message[0] == "PERDIO":
+                print("Bot %s has been aggressively destroyed. I'm afraid you just lost :(." % self.name)
+                self.disconnect()
+                return
+
             elif message[0] == "TURNO":
                 turn = message[1]
                 self.update(message[2])
                 action = self.next()
                 print("\nNow playing turn %s:" % turn)
                 print("Bot %s will %s (%s)." % (self.name, action['name'], action['command']))
+                print self.maps[-1]
                 self.client.send(action['command'])
 
-            elif message[0] == "PERDIO":
-                print("Bot %s has been aggressively destroyed. I'm afraid you just lost :(." % self.name)
-
             else:
-                # something went wrong, let's just die
-                self.connected = False
-                print("Oops. We screwed it. Run!:\n:%s" % message[0])
+                print 'Unknown message received from server:\n%s' % message[0]
+                print("Bot %s will %s (%s)." % (self.name, 'Stay', 'P'))
+                self.client.send('P')
+                # # something went wrong, let's just die
+                # print("Oops. We screwed it. Run!:\n:%s" % message[0])
+                # self.retry = False
+                # self.disconnect()
+                # return
 
     def update(self, description):
-        # keep only the three last maps
+        # keep only the last three maps
         if len(self.maps) >= 3:
-            previous = self.maps.pop(0)
+            self.maps.pop(0)
+            previous = self.maps[-1]
             target = previous.target
         else:
             target = None
 
         map = Map(description, self.name, target)
         self.maps.append(map)
-        print map
-        # print map.next('A')
+        # print map
 
     def next(self):
         # grab most recent map
-        map = self.maps[len(self.maps) - 1]
+        map = self.maps[-1]
         # calculate *best* action
         return map.next()
