@@ -22,9 +22,6 @@ class BomberBot(object):
         except KeyboardInterrupt:
             print "\n\nGoodbay!"
             self.disconnect()
-        # except:
-        #     print "\n\nWTF?"
-        #     print sys.exc_traceback
 
     def connect(self, username, token):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,43 +38,43 @@ class BomberBot(object):
         self.connected = True
 
     def disconnect(self):
+        self.client.shutdown(socket.SHUT_RDWR)
         self.client.close()
 
     def standby(self):
+        unknown = 0
         print 'Waiting to join a game...'
 
         while self.connected:
             message = self.client.recv(2048)
-            message = message.split(";")
+            parts = message.split(";")
 
-            if message[0] == "EMPEZO":
-                self.name = message[2][0]
-                self.update(message[1])
+            if parts[0] == "EMPEZO":
+                self.name = parts[2][0]
+                self.update(parts[1])
+                unknown = 0
                 print 'Bot just joined a new game as player %s.' % self.name
 
-            elif message[0] == "PERDIO":
+            elif parts[0] == "PERDIO":
                 print("Bot %s has been aggressively destroyed. I'm afraid you just lost :(." % self.name)
-                self.disconnect()
-                return
+                unknown = 0
 
-            elif message[0] == "TURNO":
-                turn = message[1]
-                self.update(message[2])
+            elif parts[0] == "TURNO":
+                turn = parts[1]
+                self.update(parts[2])
                 action = self.next()
                 print("\nNow playing turn %s:" % turn)
                 print("Bot %s will %s (%s)." % (self.name, action['name'], action['command']))
                 print self.maps[-1]
                 self.client.send(action['command'])
+                unknown = 0
 
             else:
-                print 'Unknown message received from server:\n%s' % message[0]
-                print("Bot %s will %s (%s)." % (self.name, 'Stay', 'P'))
-                self.client.send('P')
-                # # something went wrong, let's just die
-                # print("Oops. We screwed it. Run!:\n:%s" % message[0])
-                # self.retry = False
-                # self.disconnect()
-                # return
+                if unknown >= 1000:
+                    print 'A thousand unknown messages received. Quiting.'
+                    self.disconnect()
+                    return
+                unknown = unknown + 1
 
     def update(self, description):
         # keep only the last three maps
