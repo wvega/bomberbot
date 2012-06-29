@@ -76,7 +76,10 @@ class BomberBot(object):
                     return
                 unknown = unknown + 1
 
-    def update(self, description):
+    def update(self, description, reset=False):
+        if reset:
+            self.maps = []
+
         # keep only the last three maps
         if len(self.maps) >= 3:
             self.maps.pop(0)

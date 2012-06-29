@@ -157,7 +157,8 @@ class Map(object):
         # calculate suitable targets.
         # we would like to move towards powers and other players
 
-        if self.target is not None:
+        # 5% probability of dropping previous target
+        if self.target is not None and random.random() < 0.95:
             cells = self.find(lambda c: c.kind == self.target)
         else:
             cells = []
@@ -167,11 +168,6 @@ class Map(object):
         players = self.find(lambda c: c.is_player and c.kind != player.name)
         cells = cells + sorted(powers + players, comparator)
         print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
-
-        # 5% probability of dropping previous target and finding a new one, no
-        # matter how far it is
-        if random.random() > 0.95:
-            random.shuffle(cells)
 
         if len(cells) > 0:
             self.target = cells[0].kind
