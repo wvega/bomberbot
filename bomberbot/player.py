@@ -9,9 +9,9 @@ class Player(object):
     MOVE_DOWN = {'name': 'Move Down', 'command': 'S'}
     MOVE_LEFT = {'name': 'Move Left', 'command': 'O'}
     PUT_BOMB_UP = {'name': 'Put Bomb Up', 'command': 'BN'}
-    PUT_BOMB_RIGHT = {'name': 'Put Bom Right', 'command': 'BE'}
-    PUT_BOMB_DOWN = {'name': 'Put Bom Down', 'command': 'BS'}
-    PUT_BOMB_LEFT = {'name': 'Put Bom Left', 'command': 'BO'}
+    PUT_BOMB_RIGHT = {'name': 'Put Bomb Right', 'command': 'BE'}
+    PUT_BOMB_DOWN = {'name': 'Put Bomb Down', 'command': 'BS'}
+    PUT_BOMB_LEFT = {'name': 'Put Bomb Left', 'command': 'BO'}
 
     def __init__(self, name, x, y, alive=True):
         self.name = name

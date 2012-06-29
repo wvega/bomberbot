@@ -50,3 +50,4 @@ if __name__ == "__main__":
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\n X,_,A,2,_,_,_,_,2,B,X\n X,1,X,L,X,_,X,L,X,_,X\n X,L,L,L,L,2,L,L,L,L,X\n X,_,X,L,X,L,X,L,X,_,X\n X,_,_,_,L,L,L,_,_,_,X\n X,_,X,L,X,L,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,_,X,L,X,_,X\n X,_,_,L,_,_,_,L,_,_,X\n X,X,X,X,X,X,X,X,X,X,X')
 
     # bomberbot.next()
+    # print bomberbot.maps[-1]

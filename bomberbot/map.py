@@ -1,5 +1,7 @@
 #coding: utf-8
 
+import random
+
 from cell import Cell
 from player import Player
 
@@ -159,17 +161,22 @@ class Map(object):
             cells = self.find(lambda c: c.kind == self.target)
         else:
             cells = []
-        # print 'Previous:', self.target, [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
+        print 'Previous:', self.target, [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
 
         powers = self.find(lambda c: c.is_improvement)
         players = self.find(lambda c: c.is_player and c.kind != player.name)
         cells = cells + sorted(powers + players, comparator)
-        # print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
+        print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
+
+        # 5% probability of dropping previous target and finding a new one, no
+        # matter how far it is
+        if random.random() > 0.95:
+            random.shuffle(cells)
 
         if len(cells) > 0:
             self.target = cells[0].kind
 
-        # print 'Start:', start.kind, start.x, start.y, start.weight
+        print 'Start:', start.kind, start.x, start.y, start.weight
         action = self.choose(start, cells)
         print 1, action, start.weight
         # if we are on a bomb's range and the bot decided to stay, let's try to
@@ -193,7 +200,7 @@ class Map(object):
         for cell in cells:
             action = self.move(start, cell)
             if action is not None:
-                # print 'Target:', cell.kind, cell.x, cell.y, cell.weight
+                print 'Target:', cell.kind, cell.x, cell.y, cell.weight
                 break
         return action
 
@@ -296,9 +303,10 @@ class Map(object):
         return self.map[y][x]
 
     def get_adjacent_cells(self, x, y):
-        indexes = [(x, max(0, y - 1)), (x, min(10, y + 1)), (min(10, x + 1), y), (max(0, x - 1), y)]
-
         cells = []
+
+        indexes = [(x, max(0, y - 1)), (x, min(10, y + 1)), (min(10, x + 1), y), (max(0, x - 1), y)]
+        random.shuffle(indexes)
         for xy in indexes:
             cells.append(self.map[xy[1]][xy[0]])
 
