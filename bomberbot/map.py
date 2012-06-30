@@ -86,28 +86,29 @@ class Map(object):
 
         # print [c.kind for c in self.threats]
         for threat in self.threats:
-            directions = {'UP': True, 'RIGHT': True, 'DOWN': True, 'LEFT': True}
+            directions = {'UP': 1, 'RIGHT': 1, 'DOWN': 1, 'LEFT': 1}
             for s in range(1, steps + 1):
                 for k, d in enumerate(directions):
-                    if not directions[d]:
+                    if directions[d] == 0:
                         continue
                     cell = self.get_cell(threat.x, threat.y, s, d)
                     # print cell.kind, cell.x, cell.y, cell.weight
                     # print threat.x, threat.y, s, d, cell.kind
                     # block that prevent the bot from advancing in that direction
                     if cell.is_wall or cell.is_undestructible:
-                        directions[d] = False
-                        continue
+                        directions[d] = 0
+                    # do not put traps behind the player, but increase cells' cost
+                    # to alow user to turn instead of going back, when possible
                     elif cell.kind == self.player.name:
                         cell.weight = cell.weight + threat.weight
-                        directions[d] = False
-                        continue
+                        directions[d] = 2
                     # TODO: try replacing all cells with trap blocks
                     # blocks that can be replaced by bomb range blocks
-                    elif cell.is_empty or cell.is_improvement:
+                    elif (cell.is_empty or cell.is_improvement) and directions[d] == 1:
                         self.map[cell.y][cell.x] = Cell.trap(cell.x, cell.y, threat.weight, cell.parent)
                     else:
-                        cell.weight = cell.weight + threat.weight
+                        weight = 1 if directions[d] == 2 else threat.weight
+                        cell.weight = cell.weight + weight
                 # print '>', directions
 
     def measure(self, start):
