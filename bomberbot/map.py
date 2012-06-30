@@ -247,17 +247,21 @@ class Map(object):
         if start.weight > 1.5:
             return action
 
+        # find out if we can escape after putting a bomb
+        exits = self.get_adjacent_cells(start.x, start.y)
+        exits = [c for c in exits if c.is_empty or c.is_explosion or c.is_improvement]
+
         path.reverse()
 
         # if we are two blocks away from being in front of a player, let's put
         # a bomb with a probability of 40%
-        if len(path) >= 3 and random.random() < 0.4:
+        if len(exits) > 1 and len(path) >= 3 and random.random() < 0.4:
             future = path[2]  # two steps ahead
             if future.is_player:
                 return self.attack(action)
 
         # if we are moving towards a wall or a player, let's put a bomb instead
-        if len(path) >= 2:
+        if len(exits) > 1 and len(path) >= 2:
             future = path[1]  # one step ahead
             if future.is_player or future.is_wall:
                 return self.attack(action)
