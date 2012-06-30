@@ -35,6 +35,7 @@ class Cell(object):
         self.is_wall = False
         self.is_bomb = False
         self.is_bomb_range = False
+        self.is_explosion = False
         self.is_undestructible = False
 
     @classmethod
@@ -101,6 +102,7 @@ class Cell(object):
     @classmethod
     def explosion(cls, x, y, parent=None):
         block = Cell(cls.EXPLOSION, x, y, 100, parent)
+        block.is_explosion = True
         return block
 
     @classmethod

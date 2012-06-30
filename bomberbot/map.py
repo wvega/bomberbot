@@ -27,11 +27,12 @@ class Map(object):
     PLAYER_C = 'C'
     PLAYER_D = 'D'
 
-    def __init__(self, description, player_name, target=None):
+    def __init__(self, description, player_name, target=None, bombs=1):
         self.map = []
         self.description = []
         self.players = {}
         self.target = target
+        self.bombs = bombs
 
         self.parse(description)
         self.player = self.players.get(player_name, None)
@@ -227,7 +228,7 @@ class Map(object):
         # block that prevents the bot from advancing in that direction
         if next.is_wall or next.is_undestructible or next.is_player:
             return None
-        if next.is_player or next.is_bomb:
+        if next.is_bomb:
             return None
 
         if next.x == start.x:
@@ -254,30 +255,29 @@ class Map(object):
             future = path[2]  # two steps ahead
             if not future.is_player:
                 pass
-            elif action == Player.MOVE_UP:
-                return Player.PUT_BOMB_UP
-            elif action == Player.MOVE_RIGHT:
-                return Player.PUT_BOMB_RIGHT
-            elif action == Player.MOVE_DOWN:
-                return Player.PUT_BOMB_DOWN
-            elif action == Player.MOVE_LEFT:
-                return Player.PUT_BOMB_LEFT
+            return self.attack(action)
 
         # if we are moving towards a wall or a player, let's put a bomb instead
         if len(path) >= 2:
             future = path[1]  # one step ahead
             if not future.is_player and not future.is_wall:
                 return action
-            elif action == Player.MOVE_UP:
-                return Player.PUT_BOMB_UP
-            elif action == Player.MOVE_RIGHT:
-                return Player.PUT_BOMB_RIGHT
-            elif action == Player.MOVE_DOWN:
-                return Player.PUT_BOMB_DOWN
-            elif action == Player.MOVE_LEFT:
-                return Player.PUT_BOMB_LEFT
+            return self.attack(action)
 
         return action
+
+    def attack(self, action):
+        if action == Player.MOVE_UP:
+            return Player.PUT_BOMB_UP
+        elif action == Player.MOVE_RIGHT:
+            return Player.PUT_BOMB_RIGHT
+        elif action == Player.MOVE_DOWN:
+            return Player.PUT_BOMB_DOWN
+        elif action == Player.MOVE_LEFT:
+            return Player.PUT_BOMB_LEFT
+        else:
+            # TODO: try Staing instead
+            return action
 
     def find(self, filter):
         cells = []

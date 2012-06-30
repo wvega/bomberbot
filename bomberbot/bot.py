@@ -92,8 +92,10 @@ class BomberBot(object):
         # keep only the last three maps
         if len(self.maps) >= 3:
             self.maps.pop(0)
-            previous = self.maps[-1]
-            target = previous.target
+
+        if len(self.maps) > 0:
+            map = self.maps[-1]
+            target = map.target
         else:
             target = None
 
