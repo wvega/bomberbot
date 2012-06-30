@@ -3,6 +3,7 @@
 import socket
 import sys
 
+from datetime import datetime
 from exceptions import KeyboardInterrupt
 
 from map import Map
@@ -63,7 +64,7 @@ class BomberBot(object):
                 turn = parts[1]
                 self.update(parts[2])
                 action = self.next()
-                print("\nNow playing turn %s:" % turn)
+                print("\nNow playing turn %s [%s]" % (turn, datetime.now()))
                 print("Bot %s will %s (%s)." % (self.name, action['name'], action['command']))
                 print self.maps[-1]
                 self.client.send(action['command'])
