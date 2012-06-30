@@ -29,14 +29,12 @@ class Map(object):
 
     def __init__(self, description, player_name, target=None):
         self.map = []
-        self.players = {}
         self.description = []
+        self.players = {}
         self.target = target
 
         self.parse(description)
-
-        self.find_players()
-        self.player = self.get_player(player_name)
+        self.player = self.players.get(player_name, None)
 
         self.update()
 
@@ -69,8 +67,10 @@ class Map(object):
                     cell = Cell.improvement(c, k, i)
                 elif c in ['A', 'B', 'C', 'D']:
                     cell = Cell.player(c, k, i)
+                    self.players.setdefault(c.upper(), Player(c, k, i, True))
                 elif c in ['a', 'b', 'c', 'd']:
                     cell = Cell.player(c, k, i, False)
+                    self.players.setdefault(c.upper(), Player(c, k, i, False))
                 row.append(cell)
                 self.description.append(c)
             self.map.append(row)
@@ -110,26 +110,16 @@ class Map(object):
                         cell.weight = cell.weight + threat.weight
                 # print '>', directions
 
-    def next(self):
-        """
-        Returns the next action for a given Player in this map.
-        """
-
-        # calculate cost of moving
-
-        player = self.player
-        start = self.get_cell(player.x, player.y)
-
+    def measure(self, start):
         distances = [20000 for i in range(0, 121)]
         remaining = [start]
 
         # distance to current position is 0
-        distances[player.y * 11 + player.x] = 0
+        distances[start.y * 11 + start.x] = 0
 
+        # used to sort lists of cells by the cost of traveling to that position
         def comparator(a, b):
-            wa = distances[(a.y * 11) + a.x]
-            wb = distances[(b.y * 11) + b.x]
-            return cmp(wa, wb)
+            return cmp(distances[(a.y * 11) + a.x], distances[(b.y * 11) + b.x])
 
         while len(remaining) > 0:
             current = remaining.pop()
@@ -154,25 +144,50 @@ class Map(object):
             remaining = sorted(remaining, comparator)
             # print remaining
 
-        # calculate suitable targets.
-        # we would like to move towards powers and other players
+        return distances, comparator
+
+    def next(self):
+        """
+        Returns the next action for a given Player in this map.
+
+        We would like to move towards improvements and other players.
+        """
+
+        # | X,X,X,X,X,X,X,X,X,X,X |
+        # | X,B,_,_,_,L,_,_,_,_,X |
+        # | X,_,_,_,_,_,_,_,_,_,X |
+        # | X,_,D,_,_,_,L,_,_,_,X |
+        # | X,_,_,_,_,_,_,L,_,_,X |
+        # | X,L,_,L,_,_,_,L,L,L,X |
+        # | X,_,_,_,_,_,_,L,_,_,X |
+        # | X,_,_,_,_,_,L,L,_,_,X |
+        # | X,_,_,_,_,_,_,_,A,_,X |
+        # | X,_,_,_,_,_,_,_,_,_,X |
+        # | X,X,X,X,X,X,X,X,X,X,X |
+
+        player = self.player
+        start = self.get_cell(player.x, player.y)
+
+        # calculate cost of moving
+        distances, comparator = self.measure(start)
 
         # 5% probability of dropping previous target
         if self.target is not None and random.random() < 0.95:
             cells = self.find(lambda c: c.kind == self.target)
         else:
             cells = []
-        print 'Previous:', self.target, [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
 
-        powers = self.find(lambda c: c.is_improvement)
+        improvements = self.find(lambda c: c.is_improvement)
         players = self.find(lambda c: c.is_player and c.kind != player.name)
-        cells = cells + sorted(powers + players, comparator)
-        print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
+        cells = cells + sorted(improvements + players, comparator)
 
         if len(cells) > 0:
             self.target = cells[0].kind
 
+        print 'Previous:', self.target
+        print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
         print 'Start:', start.kind, start.x, start.y, start.weight
+
         action = self.choose(start, cells)
         print 1, action, start.weight
         # if we are on a bomb's range and the bot decided to stay, let's try to
@@ -242,15 +257,27 @@ class Map(object):
         if start.weight > 1.5:
             return action
 
-        # block that we should make explode into pieces
-        destructibles = [self.PLAYER_A, self.PLAYER_B, self.PLAYER_C, self.PLAYER_D,
-                         self.BLOCK_WALL]
+        path.reverse()
+
+        # if we are two blocks away from being in front of a player, let's put
+        # a bomb with a probability of 40%
+        if len(path) >= 3 and random.random() < 0.4:
+            future = path[2]  # two steps ahead
+            if not future.is_player:
+                pass
+            elif action == Player.MOVE_UP:
+                return Player.PUT_BOMB_UP
+            elif action == Player.MOVE_RIGHT:
+                return Player.PUT_BOMB_RIGHT
+            elif action == Player.MOVE_DOWN:
+                return Player.PUT_BOMB_DOWN
+            elif action == Player.MOVE_LEFT:
+                return Player.PUT_BOMB_LEFT
 
         # if we are moving towards a wall or a player, let's put a bomb instead
-        path.reverse()
         if len(path) >= 2:
             future = path[1]  # one step ahead
-            if future.kind not in destructibles:
+            if not future.is_player or not future.is_wall:
                 return action
             elif action == Player.MOVE_UP:
                 return Player.PUT_BOMB_UP
@@ -302,31 +329,30 @@ class Map(object):
         cells = []
 
         indexes = [(x, max(0, y - 1)), (x, min(10, y + 1)), (min(10, x + 1), y), (max(0, x - 1), y)]
-        random.shuffle(indexes)
         for xy in indexes:
             cells.append(self.map[xy[1]][xy[0]])
 
         return cells
 
-    def find_players(self):
-        # find players positions
-        players = [self.PLAYER_A, self.PLAYER_B, self.PLAYER_C, self.PLAYER_D]
-        lowered = self.description.lower()
+    # def find_players(self):
+    #     # find players positions
+    #     players = [self.PLAYER_A, self.PLAYER_B, self.PLAYER_C, self.PLAYER_D]
+    #     lowered = self.description.lower()
 
-        for p in players:
-            pos = lowered.find(p.lower())
+    #     for p in players:
+    #         pos = lowered.find(p.lower())
 
-            if pos == -1:
-                continue
+    #         if pos == -1:
+    #             continue
 
-            y = pos / 11
-            x = pos % 11
-            player = Player(p, x, y, self.description[pos] == p.lower())
+    #         y = pos / 11
+    #         x = pos % 11
+    #         player = Player(p, x, y, self.description[pos] == p.lower())
 
-            self.add_player(player)
+    #         self.add_player(player)
 
-    def add_player(self, player):
-        return self.players.setdefault(player.name, player)
+    # def add_player(self, player):
+    #     return self.players.setdefault(player.name, player)
 
     def get_player(self, letter):
         return self.players.get(letter, None)
