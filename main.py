@@ -5,7 +5,7 @@ from bomberbot import BomberBot
 
 if __name__ == "__main__":
     bomberbot = BomberBot()
-    bomberbot.name = 'B'
+    bomberbot.name = 'C'
     # bomberbot.start()
 
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\n X,A,_,L,_,_,_,L,_,B,X\n X,_,X,L,X,_,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,L,X,L,X,_,X\n X,_,_,_,L,L,L,_,_,_,X\n X,_,X,L,X,L,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,_,X,L,X,_,X\n X,C,_,L,_,_,_,L,_,D,X\n X,X,X,X,X,X,X,X,X,X,X')
@@ -52,8 +52,11 @@ if __name__ == "__main__":
     # put bomb when we are two blocks away from target
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\nX,B,_,_,_,L,_,_,_,_,X\nX,_,_,_,_,_,_,_,_,_,X\nX,_,D,_,_,_,L,_,_,_,X\nX,_,_,_,_,_,_,L,_,_,X\nX,L,_,L,_,_,_,L,L,L,X\nX,_,_,_,_,_,_,L,_,_,X\nX,_,_,_,_,_,L,L,_,_,X\nX,_,_,_,_,_,_,_,A,_,X\nX,_,_,_,_,_,_,_,_,_,X\nX,X,X,X,X,X,X,X,X,X,X')
 
-    bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\nX,_,_,L,L,_,L,L,_,B,X\nX,D,L,L,L,_,L,L,L,_,X\nX,L,L,L,L,_,L,L,L,L,X\nX,L,L,L,L,_,L,L,L,L,X\nX,_,_,_,_,_,_,_,_,_,X\nX,L,L,L,L,_,L,L,L,L,X\nX,L,L,L,L,_,L,L,L,L,X\nX,_,_,L,L,_,L,L,L,C,X\nX,_,_,_,L,_,L,L,_,_,X\nX,X,X,X,X,X,X,X,X,X,X')
+    # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\nX,_,_,L,L,_,L,L,_,B,X\nX,D,L,L,L,_,L,L,L,_,X\nX,L,L,L,L,_,L,L,L,L,X\nX,L,L,L,L,_,L,L,L,L,X\nX,_,_,_,_,_,_,_,_,_,X\nX,L,L,L,L,_,L,L,L,L,X\nX,L,L,L,L,_,L,L,L,L,X\nX,_,_,L,L,_,L,L,L,C,X\nX,_,_,_,L,_,L,L,_,_,X\nX,X,X,X,X,X,X,X,X,X,X')
 
-    bomberbot.maps[-1].bombs = bomberbot.maps[-1].bombs - 1
+    # bug? put a bomb to the left when no necessary. #FIXED
+    # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\nX,#,A,L,_,_,_,L,_,_,X\nX,#,X,L,X,_,X,L,X,B,X\nX,#,L,L,_,_,_,L,L,L,X\nX,_,X,_,X,_,X,_,X,_,X\nX,_,_,_,_,_,_,_,_,_,X\nX,_,X,_,X,_,X,_,X,_,X\nX,#,L,L,_,_,_,L,L,L,X\nX,#,X,L,X,_,X,L,X,D,X\nX,#,C,L,_,_,_,#,#,#,X\nX,X,X,X,X,X,X,X,X,X,X')
+    bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\nX,_,A,L,_,_,_,L,_,B,X\nX,_,X,L,X,_,X,L,X,_,X\nX,P,L,L,_,_,_,L,L,L,X\nX,_,X,_,X,_,X,_,X,_,X\nX,_,_,_,_,_,_,_,_,_,X\nX,_,X,_,X,_,X,_,X,_,X\nX,_,L,L,_,_,_,L,L,L,X\nX,_,X,L,X,_,X,L,X,D,X\nX,_,C,L,_,_,_,_,_,_,X\nX,X,X,X,X,X,X,X,X,X,X')
+
     bomberbot.next()
     print bomberbot.maps[-1]

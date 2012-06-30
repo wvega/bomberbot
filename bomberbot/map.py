@@ -253,16 +253,14 @@ class Map(object):
         # a bomb with a probability of 40%
         if len(path) >= 3 and random.random() < 0.4:
             future = path[2]  # two steps ahead
-            if not future.is_player:
-                pass
-            return self.attack(action)
+            if future.is_player:
+                return self.attack(action)
 
         # if we are moving towards a wall or a player, let's put a bomb instead
         if len(path) >= 2:
             future = path[1]  # one step ahead
-            if not future.is_player and not future.is_wall:
-                return action
-            return self.attack(action)
+            if future.is_player or future.is_wall:
+                return self.attack(action)
 
         return action
 
