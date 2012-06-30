@@ -153,18 +153,6 @@ class Map(object):
         We would like to move towards improvements and other players.
         """
 
-        # | X,X,X,X,X,X,X,X,X,X,X |
-        # | X,B,_,_,_,L,_,_,_,_,X |
-        # | X,_,_,_,_,_,_,_,_,_,X |
-        # | X,_,D,_,_,_,L,_,_,_,X |
-        # | X,_,_,_,_,_,_,L,_,_,X |
-        # | X,L,_,L,_,_,_,L,L,L,X |
-        # | X,_,_,_,_,_,_,L,_,_,X |
-        # | X,_,_,_,_,_,L,L,_,_,X |
-        # | X,_,_,_,_,_,_,_,A,_,X |
-        # | X,_,_,_,_,_,_,_,_,_,X |
-        # | X,X,X,X,X,X,X,X,X,X,X |
-
         player = self.player
         start = self.get_cell(player.x, player.y)
 

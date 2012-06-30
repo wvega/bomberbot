@@ -5,7 +5,7 @@ from bomberbot import BomberBot
 
 if __name__ == "__main__":
     bomberbot = BomberBot()
-    # bomberbot.name = 'A'
+    # bomberbot.name = 'B'
     bomberbot.start()
 
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\n X,A,_,L,_,_,_,L,_,B,X\n X,_,X,L,X,_,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,L,X,L,X,_,X\n X,_,_,_,L,L,L,_,_,_,X\n X,_,X,L,X,L,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,_,X,L,X,_,X\n X,C,_,L,_,_,_,L,_,D,X\n X,X,X,X,X,X,X,X,X,X,X')
@@ -48,6 +48,9 @@ if __name__ == "__main__":
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\n X,A,_,_,_,_,_,_,2,B,X\n X,2,X,L,X,_,X,L,X,_,X\n X,L,L,L,L,2,L,L,L,L,X\n X,_,X,L,X,L,X,L,X,_,X\n X,_,_,_,L,L,L,_,_,_,X\n X,_,X,L,X,L,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,_,X,L,X,_,X\n X,_,_,L,_,_,_,L,_,_,X\n X,X,X,X,X,X,X,X,X,X,X')
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\n X,_,A,_,_,_,_,_,2,B,X\n X,2,X,L,X,_,X,L,X,_,X\n X,L,L,L,L,2,L,L,L,L,X\n X,_,X,L,X,L,X,L,X,_,X\n X,_,_,_,L,L,L,_,_,_,X\n X,_,X,L,X,L,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,_,X,L,X,_,X\n X,_,_,L,_,_,_,L,_,_,X\n X,X,X,X,X,X,X,X,X,X,X')
     # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\n X,_,A,2,_,_,_,_,2,B,X\n X,1,X,L,X,_,X,L,X,_,X\n X,L,L,L,L,2,L,L,L,L,X\n X,_,X,L,X,L,X,L,X,_,X\n X,_,_,_,L,L,L,_,_,_,X\n X,_,X,L,X,L,X,L,X,_,X\n X,L,L,L,L,_,L,L,L,L,X\n X,_,X,L,X,_,X,L,X,_,X\n X,_,_,L,_,_,_,L,_,_,X\n X,X,X,X,X,X,X,X,X,X,X')
+
+    # put bomb when we are two blocks away from target
+    # bomberbot.update('X,X,X,X,X,X,X,X,X,X,X\nX,B,_,_,_,L,_,_,_,_,X\nX,_,_,_,_,_,_,_,_,_,X\nX,_,D,_,_,_,L,_,_,_,X\nX,_,_,_,_,_,_,L,_,_,X\nX,L,_,L,_,_,_,L,L,L,X\nX,_,_,_,_,_,_,L,_,_,X\nX,_,_,_,_,_,L,L,_,_,X\nX,_,_,_,_,_,_,_,A,_,X\nX,_,_,_,_,_,_,_,_,_,X\nX,X,X,X,X,X,X,X,X,X,X')
 
     # bomberbot.next()
     # print bomberbot.maps[-1]
