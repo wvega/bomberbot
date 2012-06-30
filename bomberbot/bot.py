@@ -23,9 +23,17 @@ class BomberBot(object):
         except KeyboardInterrupt:
             print "\n\nGoodbay!"
             self.disconnect()
+        except IOError as e:
+            print e
+            self.restart()
+
+    def restart(self):
+        self.disconnect()
+        self.start()
 
     def connect(self, username, token):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
         self.client.connect(("bomberbot.com", 5000))
 
         message = self.client.recv(4096)
@@ -51,7 +59,7 @@ class BomberBot(object):
             parts = message.split(";")
 
             if parts[0] == "EMPEZO":
-                self.name = parts[2][0]
+                self.name = parts[2].strip()
                 self.update(parts[1], True)
                 print 'Bot just joined a new game as player %s.' % self.name
                 unknown = 0
@@ -63,11 +71,11 @@ class BomberBot(object):
             elif parts[0] == "TURNO":
                 turn = parts[1]
                 self.update(parts[2])
+                print("\nNow playing turn %s [%s]\n" % (turn, datetime.now()))
                 action = self.next()
-                print("\nNow playing turn %s [%s]" % (turn, datetime.now()))
-                print("Bot %s will %s (%s)." % (self.name, action['name'], action['command']))
-                print self.maps[-1]
                 self.client.send(action['command'])
+                print self.maps[-1]
+                print("Bot %s will %s (%s)." % (self.name, action['name'], action['command']))
                 unknown = 0
 
             else:
