@@ -51,9 +51,9 @@ class BomberBot(object):
 
             if parts[0] == "EMPEZO":
                 self.name = parts[2][0]
-                self.update(parts[1])
-                unknown = 0
+                self.update(parts[1], True)
                 print 'Bot just joined a new game as player %s.' % self.name
+                unknown = 0
 
             elif parts[0] == "PERDIO":
                 print("Bot %s has been aggressively destroyed. I'm afraid you just lost :(." % self.name)
