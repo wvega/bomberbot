@@ -169,12 +169,12 @@ class Map(object):
         players = self.find(lambda c: c.is_player and c.kind != player.name)
         cells = cells + sorted(improvements + players, comparator)
 
-        if len(cells) > 0:
-            self.target = cells[0].kind
-
         print 'Previous:', self.target
         print 'Targets:', [(c.kind, distances[c.y * 11 + c.x]) for c in cells]
         print 'Start:', start.kind, start.x, start.y, start.weight
+
+        if len(cells) > 0:
+            self.target = cells[0].kind
 
         action = self.choose(start, cells)
         print 1, action, start.weight
@@ -265,7 +265,7 @@ class Map(object):
         # if we are moving towards a wall or a player, let's put a bomb instead
         if len(path) >= 2:
             future = path[1]  # one step ahead
-            if not future.is_player or not future.is_wall:
+            if not future.is_player and not future.is_wall:
                 return action
             elif action == Player.MOVE_UP:
                 return Player.PUT_BOMB_UP
