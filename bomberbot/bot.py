@@ -47,8 +47,11 @@ class BomberBot(object):
         self.connected = True
 
     def disconnect(self):
-        self.client.shutdown(socket.SHUT_RDWR)
-        self.client.close()
+        try:
+            self.client.shutdown(socket.SHUT_RDWR)
+            self.client.close()
+        except IOError:
+            pass
 
     def standby(self):
         unknown = 0
